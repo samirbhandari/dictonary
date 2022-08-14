@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+
+*{
+  margin: 0;
+  padding: 0;
+}
+body{
+  height: 100vh;
+  background-color: rgb(225, 197, 225);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.main-cont{
+min-height: 50%;
+    margin-top: 17vh;
+    width: 50%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    border-radius: 20px;
+   
+}
+.searchbox{
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+
+}
+#search{
+  margin-right: 10px;
+  border: none;
+  outline: none;
+  border-bottom: 3px solid rgb(137, 137, 248);
+  padding-bottom: 5px;
+
+}
+button{
+  background-color: rgb(76, 76, 224);
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+
+}
+span{
+margin: 0px auto;
+}
+ul{
+  list-style: none;
+  
+}
+li{
+  margin-left: 4px;
+}
+hr{
+  background-color: blue;
+  margin: 5px 0px;
+}
+
+.resulttopic{
+font-weight: 900;
+}
+@media(max-width:800px){
+  body{
+    background-color: rgb(191, 221, 221);
+  }
+  .main-cont{
+    width: 90%;
+    min-height: 50%;
+   
+    margin: 0;
+    border-radius: 30px;
+  }
+}
+
+    </style>
+</head>
+<body>
+  <div class="main-cont">
+    <div class="searchbox">
+      <input autocomplete="off" placeholder="Search Word Here..."  onkeydown="ent(event.key)
+      " type="text" onclick="as()" name="" id="search">
+      <button onclick="mainfun()">Search</button>
+    </div>
+    <span style="color:black"></span>
+    
+
+    <div class="dic-res">
+      
+      <ul>
+        <li id="meanings" class="resulttopic">Meanings <span><i id="volume" onclick="volume()" class="fa fa-volume-up" style="color:blue"></i></span>
+          <p>
+            <li class='mean' style="display:inline "></li>
+            
+          </p>
+          
+        </li>
+        <hr>
+        <li id="syn" class="resulttopic">Synonyms
+          <p>
+            <li class='syn' style="display:inline "></li>
+          </p>
+          
+        </li>
+        <hr>
+        <li id="anto" class="resulttopic">Antonyms
+          <p>
+            <li class='anto' style="display:inline "></li>
+
+          </p>
+        </li>
+        <hr>
+        <li id="exm" class="resulttopic">Examples
+          <p>
+            <li class="ex" style="display:inline "></li>
+           
+          </p>
+          
+        </li>
+        
+      </ul>
+    </div>
+
+  </div>
+</body>
+<script>
+  let volPro;
+  function mainfun(){
+    document.querySelector('span').style.color='Black';
+    document.querySelector('span').innerText='Searching Data...'
+    var word=document.querySelector('input').value;
+
+
+    fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+word).then((response)=>{
+      
+      return response.json();
+    })
+    
+    .then((actualdata)=>{
+      
+      if(actualdata.title!=='No Definitions Found'){
+       volPro=(actualdata[0].phonetics[0].audio);
+       //filling value in field
+var meana=document.getElementsByClassName('mean');
+for(i=0;i<1;i++){
+  var xc=(actualdata[0].meanings[0].definitions[0].definition);
+  meana[0].innerText=xc;
+}
+
+var sunm=document.getElementsByClassName('syn');
+  var xc=(actualdata[0].meanings[0].synonyms[0])
+  if(xc==undefined){
+    xc="This Word don't have any Synonym"
+  
+    var cel=document.createElement('a');
+    cel.setAttribute('target','_main')
+    cel.setAttribute('href','https://www.google.com/search?q='+word)
+    
+    cel.innerHTML='Click here for more Information.'
+    var wee=document.getElementById('syn').appendChild(cel);
+  }
+  sunm[0].innerText=xc;
+
+
+  var antoo=document.getElementsByClassName('anto');
+  var xc=(actualdata[0].meanings[0].antonyms[0])
+  if(xc==undefined){
+    xc="This Word don't have any Antonym"
+   var cel=document.createElement('a');
+    cel.setAttribute('target','_main')
+    cel.setAttribute('href','https://www.google.com/search?q='+word)
+    
+    cel.innerHTML='Click here for more Information.'
+    var wee=document.getElementById('anto').appendChild(cel); 
+
+  }
+  antoo[0].innerText=xc;
+
+  var exo=document.getElementsByClassName('ex');
+  var df=(actualdata[0].meanings[0].definitions[1].definition)
+ exo[0].innerText=df;
+//
+       
+      }
+     
+
+      document.querySelector('span').innerText='';
+
+
+      if(actualdata.title=='No Definitions Found'){
+        document.querySelector('span').style.color='red';
+        document.querySelector('span').innerText='Sorry , Word Not Found'
+      }
+
+    })
+
+
+    .catch((io)=>{
+      document.querySelector('span').style.color='red';
+      document.querySelector('span').innerText='Connection Error..';
+      if(word==''){
+        document.querySelector('span').innerText='Enter a Word...';
+      }
+      console.log(io.title)
+      if(io.title==undefined){
+        document.querySelector('span').innerText='';
+      }
+    })
+  }
+
+  // function claer(){
+  //   console.log('lo')
+  //  var qa= document.querySelectorAll('a');
+  //  for(i=0;i<qa.length-1;i++){
+  //   console.log(qa[i])
+  //   qa[i].innerHTML=''
+  //  }
+  // }
+
+
+function volume(){
+  new Audio(volPro).play();
+  }
+
+
+
+
+
+
+
+
+
+function a(){
+  var w=new Audio('//api.dictionaryapi.dev/media/pronunciations/en/hello-au.mp3');
+  w.play();
+  document.querySelector('audio').setAttribute('autoplay','')
+}
+function as(){
+  var qp=document.querySelectorAll('a');
+  for(i=0;i<qp.length;i++){
+    qp[i].style.display='none';
+  }
+}
+function ent(a){
+  if(a=='Enter'){
+ mainfun()
+  }
+}
+</script>
+</html>                                                                                          
+                                                                                   
